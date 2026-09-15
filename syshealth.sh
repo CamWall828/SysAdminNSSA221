@@ -2,12 +2,16 @@
 # ===============================================
 # syshealth.sh - System Health & Log Analysis Toolkit
 # Lab 1 - Data Collector
-# Author: Your Name
+# Author: Cameron Wallace
 # Date: $(date +%Y-%m-%d)
 # ==============================================
 # --- Variables and quoting demonstration ---
 HOSTNAME=$(hostname)
 CURRENT_DATE=$(date '+%Y-%m-%d %H:%M:%S')
+# --- Thresholds (change these values to test alert behavior) ---
+CPU_THRESHOLD=75
+MEM_THRESHOLD=85
+DISK_THRESHOLD=85
 # IMPORTANT: Quoting demo (Python/Java students read this!)
 # Without quotes → word-splitting bug (try it!)
 # With double quotes → safe (Bash best practice)
