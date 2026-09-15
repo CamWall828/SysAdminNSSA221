@@ -102,7 +102,7 @@ print_report() {
 	printf "Disk / : %s\n" "$DISK_USAGE"
 	printf "Memory used : %s\n" "$MEMORY_USAGE"
 	printf "Total processes : %s\n" "$PROCESS_COUNT"
-	printf "Health Status	: %s\n" '$([ "$HEALTH_STATUS" -eq 0] && echo "HEALTHY" || echo "UNHEALTHY - see alerts above")'
+	printf "Health Status	: %s\n" "$([ "$HEALTH_STATUS" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY - see alerts above")"
 	printf "========================================\n"
 }
 

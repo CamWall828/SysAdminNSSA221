@@ -1,0 +1,6 @@
+* 7db2d5c (HEAD -> master, origin/master) Fixed gramtical typo within sys.health that caused the code to not execut properly
+* 5d09e3c Add positional argument handling and report output
+* d9ce3b2 Implement coommand subtitution for system metrics
+* 7f06f67 Demonstrate quoting rules with explanatory comment
+* 7a638f4 Add shebang and make syshealth.sh executable
+* f10e565 Initial commit: project skeleton and README
