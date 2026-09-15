@@ -102,12 +102,14 @@ print_report() {
 	printf "Disk / : %s\n" "$DISK_USAGE"
 	printf "Memory used : %s\n" "$MEMORY_USAGE"
 	printf "Total processes : %s\n" "$PROCESS_COUNT"
+	printf "Health Status	: %s\n" '$([ "$HEALTH_STATUS" -eq 0] && echo "HEALTHY" || echo "UNHEALTHY - see alerts above")'
 	printf "========================================\n"
 }
+
 if [ -n "$OUTPUT_FILE" ]; then
 	print_report > "$OUTPUT_FILE"
-	echo "Report written to $OUTPUT_FILE"
+	echo "Report written to $OUTPUT_FILE (alerts were printed to terminal)"
 else
 	print_report
 fi
-exit 0
+exit "${HEALTH_STATUS:-0}"
