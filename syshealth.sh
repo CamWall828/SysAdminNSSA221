@@ -118,10 +118,21 @@ generate_report() {
 }
 
 main() {
-	# This will be the ONLY code that runs at the top level
 	parse_arguments "$@"
+
+	# Run all health checks (prints colored alerts to terminal)
 	run_health_checks
-	generate_report
+
+	# Generate the structured report (to screen or file)
+	if [ -n "$OUTPUT_FILE" ]; then
+		generate_report > "$OUTPUT_FILE"
+		echo "Report written to $OUTPUT_FILE"
+	else
+		generate_report
+	fi
+
+	# Exit with the aggregated health status from run_health_checks
+	exit "${HEALTH_STATUS:-0}"
 }
 
 # The single call that starts everything — must be the very last line
