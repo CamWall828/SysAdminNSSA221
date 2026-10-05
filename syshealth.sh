@@ -13,11 +13,21 @@ DISK_THRESHOLD=85
 
 # --- Function definitions will go here (print_status, check_*, run_*, parse_*, generate_*) ---
 
+print_status() {
+	local status="$1"
+	local message="$2"
+	if [ "$status" = "OK" ]; then
+		echo -e "\e[32m OK: $message\e[0m"
+	else
+		echo -e "\e[31m ALERT: $message\e[0m"
+   	fi
+}
+
 main() {
-# This will be the ONLY code that runs at the top level
-parse_arguments "$@"
-run_health_checks
-generate_report
+	# This will be the ONLY code that runs at the top level
+	parse_arguments "$@"
+	run_health_checks
+	generate_report
 }
 
 # The single call that starts everything — must be the very last line
