@@ -93,6 +93,22 @@ run_health_checks() {
 	return "$overall_status"
 }
 
+analyze_logs() {
+	local log_file="${1:-/var/log/messages}" # default to Rocky Linux 9 main log
+	local errors=0
+	local warnings=0
+	local failed_logins=0
+	local top_issues
+
+	# Count issues using extended regex (case-insensitive where useful)
+	errors=$(grep -E -i 'ERROR|Error|error' "$log_file" 2>/dev/null | wc -l)
+	warnings=$(grep -E -i 'WARNING|Warning|warning' "$log_file" 2>/dev/null | wc -l)
+	failed_logins=$(grep -E -i 'Failed password|authentication failure|Failed login' "$log_file" 2>/dev/null | wc -l)
+
+	# Grep Implementation
+	grep -E -i 'ERROR|Error|error|WARNING|Warning|warning|Failed password|authentication failure' "$log_file" 2>/dev/null
+}
+
 parse_arguments() {
 	OUTPUT_FILE="${1:-}" # if $1 is given, use it as output file; otherwise empty
 }
