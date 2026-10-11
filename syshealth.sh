@@ -105,8 +105,13 @@ analyze_logs() {
 	warnings=$(grep -E -i 'WARNING|Warning|warning' "$log_file" 2>/dev/null | wc -l)
 	failed_logins=$(grep -E -i 'Failed password|authentication failure|Failed login' "$log_file" 2>/dev/null | wc -l)
 
-	# Grep Implementation
-	grep -E -i 'ERROR|Error|error|WARNING|Warning|warning|Failed password|authentication failure' "$log_file" 2>/dev/null
+	# Top 5 most common error/warning messages (cleaned with sed)
+	grep -E -i 'ERROR|Error|error|WARNING|Warning|warning|Failed password|authentication failure' "$log_file" 2>/dev/null \
+		| sed 's/.*\]: //' \
+		| sort \
+		| uniq -c \
+		| sort -nr \
+		| head -5
 }
 
 parse_arguments() {
