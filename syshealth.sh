@@ -112,6 +112,12 @@ analyze_logs() {
 		| uniq -c \
 		| sort -nr \
 		| head -5
+	
+	# Summary section
+	printf "\nLog Analysis Summary (%s):\n" "$(basename "$log_file")"
+	printf " Errors : %d\n" "$errors"
+	printf " Warnings : %d\n" "$warnings"
+	printf " Failed logins : %d\n" "$failed_logins"
 }
 
 parse_arguments() {
@@ -136,6 +142,12 @@ generate_report() {
 	printf "Total processes : %s\n" "$PROCESS_COUNT"
 	printf "Health status : %s\n" "$([ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY - see alerts above")"
 	printf "========================================\n"
+
+	# sCRIPT 4 NEW, CALLS analyze_logs
+	printf "\n========================================\n"
+	printf "LOG ANALYSIS SUMMARY\n"
+	printf "========================================\n"
+	analyze_logs # uses default /var/log/message
 }
 
 main() {
