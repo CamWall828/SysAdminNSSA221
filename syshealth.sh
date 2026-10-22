@@ -138,6 +138,7 @@ analyze_logs() {
 	failed_logins=$(grep -E -i 'Failed password|authentication failure|Failed login' "$log_file" 2>/dev/null | wc -l || true)
 
 	# Top 5 most common error/warning messages (cleaned with sed)
+	printf "\nTop 5 recurring issues:\n"
 	grep -E -i 'ERROR|Error|error|WARNING|Warning|warning|Failed password|authentication failure' "$log_file" 2>/dev/null \
 		| sed 's/.*\]: //' \
 		| sort \
@@ -229,4 +230,4 @@ main() {
 }
 
 # The single call that starts everything — must be the very last line
-main
+main "$@"
