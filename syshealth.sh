@@ -94,17 +94,20 @@ run_health_checks() {
 	# Disk checks via loop (replaces the inline for-loop from Lab 2)
 	for mount in / /home /var; do
 		if ! check_disk_usage "$mount"; then
+			log_message "ALERT" "Mount Check Failed"
 			overall_status=1
 		fi
 	done
 
 	# Memory check
 	if ! check_memory_usage; then
+		log_message "ALERT" "Memory Check Failed"
 		overall_status=1
 	fi
 
 	# CPU check
 	if ! check_cpu_usage; then
+		log_message "ALERT" "CPU Check Failed"
 		overall_status=1
 	fi
 
@@ -125,6 +128,7 @@ analyze_logs() {
 		printf "\nLog Analysis Summary (%s):\n" "$(basename "$log_file")"
 		printf " Log file not readable or does not exist on this system.\n"
 		printf " (This is normal in some containers or minimal installs.)\n"
+		log_message "ERROR" "Log File Missing"
 		return 0
 	fi
 
@@ -171,23 +175,37 @@ generate_report() {
 	printf "Health status : %s\n" "$([ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY - see alerts above")"
 	printf "========================================\n"
 
-	# sCRIPT 4 NEW, CALLS analyze_logs
+	# SCRIPT 4 NEW, CALLS analyze_logs
 	printf "\n========================================\n"
 	printf "LOG ANALYSIS SUMMARY\n"
 	printf "========================================\n"
 	analyze_logs # uses default /var/log/message
+	log_message "INFO" "Syshelath Report Generated"
 }
 
 main() {
 	parse_arguments "$@"
+	log_message "INFO" "syshealth.sh started (Lab 5)"
 
 	# Run all health checks (prints colored alerts to terminal)
 	run_health_checks
+
+	# Create Array with desired metrics
+	local -a report_metrics
+	report_metrics=(
+	"Hostname: $(hostname)"
+	"Uptime: $(uptime -p)"
+	"Disk /: $(df -h / | tail -1)"
+	"Memory used: $(free -h | awk '/Mem:/ {print $3 "/" $2}')"
+	"Total processes: $(ps -e | wc -l)"
+	"Health status: $([ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY - see above alerts")"
+)
 
 	# Generate the structured report (to screen or file)
 	if [ -n "$OUTPUT_FILE" ]; then
 		generate_report > "$OUTPUT_FILE"
 		echo "Report written to $OUTPUT_FILE"
+		log_message "INFO" "Report written to $OUTPUT_FILE"
 	else
 		generate_report
 	fi
