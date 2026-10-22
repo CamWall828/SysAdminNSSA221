@@ -29,6 +29,20 @@ print_status() {
    	fi
 }
 
+# -- Creates Log File and Inputs in Logs --
+log_message() {
+	local level="$1"
+	local message="$2"
+	local log_file="$HOME/.syshealth.log"
+	local timestamp
+	timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+	# Ensure log directory exists (in case $HOME is unusual)
+	mkdir -p "$(dirname "$log_file")"
+
+	echo "$timestamp [$level] $message" >> "$log_file"
+}
+
 check_disk_usage() {
 	local mount="$1"
 	local pct threshold
