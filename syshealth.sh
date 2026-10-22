@@ -6,6 +6,12 @@
 # Date: 2026-10-04
 # ===============================================
 
+# -- Enabling Strict Mode --
+set -euo pipefail
+	# Trap for logging on error or unexpected exit
+trap 'log_message "ERROR" "Script exited unexpectedly with code $?"' ERR
+trap 'log_message "INFO" "Script finished normally with code $?"' EXIT
+
 # --- Thresholds (global, used by multiple functions) ---
 CPU_THRESHOLD=75
 MEM_THRESHOLD=85
