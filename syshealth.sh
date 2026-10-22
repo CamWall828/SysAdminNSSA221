@@ -158,21 +158,21 @@ parse_arguments() {
 
 generate_report() {
 	# Re-collect the human-readable metrics (same as Lab 1)
-	local CURRENT_DATE HOSTNAME UPTIME DISK_USAGE MEMORY_USAGE PROCESS_COUNT
+	local CURRENT_DATE
 	CURRENT_DATE=$(date '+%Y-%m-%d %H:%M:%S')
-	HOSTNAME=$(hostname)
-	UPTIME=$(uptime -p)
-	DISK_USAGE=$(df -h / | tail -1)
-	MEMORY_USAGE=$(free -h | awk '/Mem:/ {print $3 "/" $2}')
-	PROCESS_COUNT=$(ps -e | wc -l)
+
+	# Old non-array variables
+	# HOSTNAME=$(hostname)
+	# UPTIME=$(uptime -p)
+	# DISK_USAGE=$(df -h / | tail -1)
+	# MEMORY_USAGE=$(free -h | awk '/Mem:/ {print $3 "/" $2}')
+	# PROCESS_COUNT=$(ps -e | wc -l)
+
 	printf "========================================\n"
 	printf "System Health Report - %s\n" "$CURRENT_DATE"
-	printf "Hostname : %s\n" "$HOSTNAME"
-	printf "Uptime : %s\n" "$UPTIME"
-	printf "Disk / : %s\n" "$DISK_USAGE"
-	printf "Memory used : %s\n" "$MEMORY_USAGE"
-	printf "Total processes : %s\n" "$PROCESS_COUNT"
-	printf "Health status : %s\n" "$([ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY - see alerts above")"
+		for metric in "${report_metrics[@]}"; do
+			printf "%s\n" "$metric"
+		done
 	printf "========================================\n"
 
 	# SCRIPT 4 NEW, CALLS analyze_logs
@@ -180,7 +180,19 @@ generate_report() {
 	printf "LOG ANALYSIS SUMMARY\n"
 	printf "========================================\n"
 	analyze_logs # uses default /var/log/message
-	log_message "INFO" "Syshelath Report Generated"
+
+	# Professional here-document footer
+	cat << EOF
+--- End of Report ---
+Script: syshealth.sh (Lab 5 - Error Handling & Professional Reports)
+Generated: $CURRENT_DATE
+Exit status: ${HEALTH_STATUS:-0} ($( [ "${HEALTH_STATUS:-0}" -eq 0 ] && echo
+"HEALTHY" || echo "UNHEALTHY"))
+Log file: $HOME/.syshealth.log
+========================================
+EOF
+
+	log_message "INFO" "Syshelath Report Generated (exit code ${HEALTH_STATUS:-0})"
 }
 
 main() {
