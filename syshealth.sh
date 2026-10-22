@@ -112,7 +112,7 @@ run_health_checks() {
 	fi
 
 	# Store result for generate_report / exit
-	HEALTH_STATUS= "$overall_status"
+	HEALTH_STATUS="$overall_status"
 	return "$overall_status"
 }
 
@@ -135,7 +135,7 @@ analyze_logs() {
 	# Count issues using extended regex (case-insensitive where useful)
 	errors=$(grep -E -i 'ERROR|Error|error' "$log_file" 2>/dev/null | wc -l)
 	warnings=$(grep -E -i 'WARNING|Warning|warning' "$log_file" 2>/dev/null | wc -l)
-	failed_logins=$(grep -E -i 'Failed password|authentication failure|Failed login' "$log_file" 2>/dev/null | wc -l)
+	failed_logins=$(grep -E -i 'Failed password|authentication failure|Failed login' "$log_file" 2>/dev/null | wc -l || true)
 
 	# Top 5 most common error/warning messages (cleaned with sed)
 	grep -E -i 'ERROR|Error|error|WARNING|Warning|warning|Failed password|authentication failure' "$log_file" 2>/dev/null \
@@ -182,12 +182,14 @@ generate_report() {
 	analyze_logs # uses default /var/log/message
 
 	# Professional here-document footer
+
+	printf "\n"
+
 	cat << EOF
 --- End of Report ---
 Script: syshealth.sh (Lab 5 - Error Handling & Professional Reports)
 Generated: $CURRENT_DATE
-Exit status: ${HEALTH_STATUS:-0} ($( [ "${HEALTH_STATUS:-0}" -eq 0 ] && echo
-"HEALTHY" || echo "UNHEALTHY"))
+Exit status: ${HEALTH_STATUS:-0} ($( [ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY"))
 Log file: $HOME/.syshealth.log
 ========================================
 EOF
