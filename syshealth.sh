@@ -197,11 +197,10 @@ parse_arguments() {
 			r) MODE="report" ;;
 			h) usage ;;
 			i) version ;;
-			-) # Long options
-				case "${OPTARG}" in
+			-) case "${OPTARG}" in # Long Options
 					monitor) MODE="monitor";; 
 					analyze) MODE="analyze";; 
-					report)MODE="report";; 
+					report) MODE="report";; 
 					help) usage ;;
 					version) version ;;
 					*) echo "Unknown long option: --${OPTARG}" >&2; usage ;;
@@ -219,6 +218,33 @@ parse_arguments() {
 	
 	# Default mode if none specified
 	MODE="${MODE:-report}"
+}
+
+run_mode() {
+	case "${MODE:-report}" in
+		monitor)
+			log_message "INFO" "Running in MONITOR mode"
+			print_status "CHECK" "Running health checks only..." 
+			run_health_checks ;;
+		analyze)
+			log_message "INFO" "Running in ANALYZE mode"
+			printf "========================================\n"
+			printf "LOG ANALYSIS ONLY\n"
+			printf "========================================\n"
+			analyze_logs ;;
+		report)
+			log_message "INFO" "Running in REPORT mode (full)"
+			run_health_checks || true
+			if [ -n "$OUTPUT_FILE" ]; then
+				generate_report > "$OUTPUT_FILE"
+				echo "Full report written to $OUTPUT_FILE"
+			else
+				generate_report
+			fi ;;
+		*)
+			echo "Unknown mode: $MODE" >&2
+			usage ;;
+	esac
 }
 
 generate_report() {
