@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ===============================================
 # syshealth.sh - System Health & Log Analysis Toolkit
-# Lab 3 - Refactoring into Functions
+# Lab 6 - Capstone
 # Author: Cameron Wallace
-# Date: 2026-10-04
+# Date: 2026-11-08
 # ===============================================
 
 # -- Enabling Strict Mode --
@@ -16,6 +16,9 @@ trap 'log_message "INFO" "Script finished normally with code $?"' EXIT
 CPU_THRESHOLD=75
 MEM_THRESHOLD=85
 DISK_THRESHOLD=85
+
+# --- Output File Initlaization --
+OUTPUT_FILE=""
 
 # --- Function definitions will go here (print_status, check_*, run_*, parse_*, generate_*) ---
 
@@ -207,13 +210,13 @@ parse_arguments() {
 				esac ;;
 			\?) echo "Invalid option: -$OPTARG" >&2; usage ;;
 			:) echo "Option -$OPTARG requires an argument." >&2; usage ;; 
-			esac ;;
+			esac 
 		done
 
 	# Handle any remaining positional argument (backward compatibility for output file)
 		shift $((OPTIND - 1))
 		if [ -n "${1:-}" ] && [ -z "${OUTPUT_FILE:-}" ]; then 
-			OUTPUT_FILE="$1" 
+			OUTPUT_FILE="{$1:-}" 
 		fi
 	
 	# Default mode if none specified
@@ -278,7 +281,7 @@ generate_report() {
 
 	cat << EOF
 --- End of Report ---
-Script: syshealth.sh (Lab 5 - Error Handling & Professional Reports)
+Script: syshealth.sh (Lab 6 - Capstone Lab)
 Generated: $CURRENT_DATE
 Exit status: ${HEALTH_STATUS:-0} ($( [ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY"))
 Log file: $HOME/.syshealth.log
