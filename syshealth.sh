@@ -153,6 +153,36 @@ analyze_logs() {
 	printf " Failed logins : %d\n" "$failed_logins"
 }
 
+usage() {
+	cat << 
+"Usage: $(basename "$0") [OPTION] [OUTPUT_FILE]
+
+System Health & Log Analysis Toolkit (Capstone - Lab 6)
+
+Options:
+	-m, --monitor Run health checks only (CPU, memory, disk) with colored alerts
+	-a, --analyze Run log analysis only (default: /var/log/messages)
+	-r, --report Generate full timestamped report (metrics + alerts + logs)
+	-h, --help Show this help message and exit
+	-v, --version Show version information and exit
+
+Positional argument (backward compatible):
+	OUTPUT_FILE Optional filename to write the report to (e.g. daily_repo rt.txt)
+
+Examples:
+	$(basename "$0") --monitor
+	$(basename "$0") --report daily_$(date +%F).txt
+	$(basename "$0") -a /var/log/secure
+Report bugs to your instructor. EOF"
+	exit 0
+}
+
+version() {
+	echo "syshealth.sh version 1.0 (NSSA221 Scripting Series - Capstone)" echo "Built as final project - $(date '+%Y')"
+	echo "Features: Health checks, log analysis, strict mode, persistent logging, CLI modes"
+	exit 0
+}
+
 parse_arguments() {
 	OUTPUT_FILE="${1:-}" # if $1 is given, use it as output file; otherwise empty
 }
