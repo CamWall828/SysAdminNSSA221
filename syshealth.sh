@@ -154,8 +154,8 @@ analyze_logs() {
 }
 
 usage() {
-	cat << 
-"Usage: $(basename "$0") [OPTION] [OUTPUT_FILE]
+	cat << EOF
+Usage: $(basename "$0") [OPTION] [OUTPUT_FILE]
 
 System Health & Log Analysis Toolkit (Capstone - Lab 6)
 
@@ -173,7 +173,9 @@ Examples:
 	$(basename "$0") --monitor
 	$(basename "$0") --report daily_$(date +%F).txt
 	$(basename "$0") -a /var/log/secure
-Report bugs to your instructor. EOF"
+
+Report bugs to your instructor. 
+EOF
 	exit 0
 }
 
@@ -184,7 +186,39 @@ version() {
 }
 
 parse_arguments() {
-	OUTPUT_FILE="${1:-}" # if $1 is given, use it as output file; otherwise empty
+	local opt
+	# Reset OPTIND in case the function is called multiple times
+	OPTIND=1
+
+	while getopts ":marhv-:" opt; do
+		case "$opt" in
+			m) MODE="monitor" ;;
+			a) MODE="analyze" ;;
+			r) MODE="report" ;;
+			h) usage ;;
+			i) version ;;
+			-) # Long options
+				case "${OPTARG}" in
+					monitor) MODE="monitor";; 
+					analyze) MODE="analyze";; 
+					report)MODE="report";; 
+					help) usage ;;
+					version) version ;;
+					*) echo "Unknown long option: --${OPTARG}" >&2; usage ;;
+				esac ;;
+			\?) echo "Invalid option: -$OPTARG" >&2; usage ;;
+			:) echo "Option -$OPTARG requires an argument." >&2; usage ;; 
+			esac ;;
+		done
+
+	# Handle any remaining positional argument (backward compatibility for output file)
+		shift $((OPTIND - 1))
+		if [ -n "${1:-}" ] && [ -z "${OUTPUT_FILE:-}" ]; then 
+			OUTPUT_FILE="$1" 
+		fi
+	
+	# Default mode if none specified
+	MODE="${MODE:-report}"
 }
 
 generate_report() {
