@@ -290,33 +290,14 @@ EOF
 
 main() {
 	parse_arguments "$@"
-	log_message "INFO" "syshealth.sh started (Lab 5)"
+	log_message "INFO" "syshealth.sh started in mode: ${MODE:-report}"
 
-	# Run all health checks (prints colored alerts to terminal)
-	run_health_checks
+	run_mode
 
-	# Create Array with desired metrics
-	local -a report_metrics
-	report_metrics=(
-	"Hostname: $(hostname)"
-	"Uptime: $(uptime -p)"
-	"Disk /: $(df -h / | tail -1)"
-	"Memory used: $(free -h | awk '/Mem:/ {print $3 "/" $2}')"
-	"Total processes: $(ps -e | wc -l)"
-	"Health status: $([ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY - see above alerts")"
-)
-
-	# Generate the structured report (to screen or file)
-	if [ -n "$OUTPUT_FILE" ]; then
-		generate_report > "$OUTPUT_FILE"
-		echo "Report written to $OUTPUT_FILE"
-		log_message "INFO" "Report written to $OUTPUT_FILE"
-	else
-		generate_report
+	# For monitor/analyze modes that don't already exit inside generate report
+	if [ "${MODE:-report}" != "report" ]; then
+		exit "${HEALTH_STATUS:-0}"
 	fi
-
-	# Exit with the aggregated health status from run_health_checks
-	exit "${HEALTH_STATUS:-0}"
 }
 
 # The single call that starts everything — must be the very last line
